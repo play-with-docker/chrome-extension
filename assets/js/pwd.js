@@ -1,20 +1,11 @@
-addDialog();
-chrome.runtime.onMessage.addListener(
+chrome.extension.onMessage.addListener(
     function(request, sender, sendResponse) {
-        setCurrentRepo(request.repo);
         if (!$('#try-in-pwd').length) {
             $('section.secondary-top-bar-section ul').append('<li><a id="try-in-pwd" data-toggle="modal" data-target="#try-in-pwd-modal"><img src="' + chrome.extension.getURL('assets/images/button.png') + '" /></a></li>');
         }
     }
 );
-
-function setCurrentRepo(repo) {
-    var appElement = document.querySelector('[ng-app=PWD]');
-    var $scope = angular.element(appElement).scope();
-    if ($scope) {
-        $scope.changeRepo(repo);
-    }
-}
+addDialog();
 
 function addDialog() {
     var container = $('body').append('<div id="pwd-dialog"></div>');
@@ -26,7 +17,25 @@ angular.module('PWD', [])
         $scope.currentRepo = null;
         $scope.tags = [];
 
+        chrome.storage.sync.get({
+            pwdUrl: 'http://play-with-docker.com'
+        }, function(opts) {
+            $scope.pwdUrl = opts.pwdUrl;
+        });
+
         var pwd = this;
+
+        chrome.extension.onMessage.addListener(
+            function(request, sender, sendResponse) {
+                if (request.type == 'change-repo') {
+                    $scope.changeRepo(request.repo);
+                } else if(request.type == 'change-opts') {
+                    $scope.$apply(function() {
+                        $scope.pwdUrl = request.opts.pwdUrl;
+                    });
+                }
+            }
+        );
 
         $scope.changeRepo = function(repo) {
             if (repo != $scope.currentRepo) {

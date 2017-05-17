@@ -22,7 +22,7 @@
                                     <tbody>
                                         <tr ng-repeat="tag in tags">
                                             <td><a href="{{tag.html_url}}/stack.yml" target="_blank">{{tag.name}}</a></td>
-                                            <td><a class="btn btn-primary btn-sm" href="http://localhost?stack={{currentRepo}}/{{tag.name}}/stack.yml" target="_blank">Try</a></td>
+                                            <td><a class="btn btn-primary btn-sm" href="{{pwdUrl}}?stack={{currentRepo}}/{{tag.name}}/stack.yml" target="_blank">Try</a></td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -31,7 +31,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <a class="btn btn-primary" href="http://play-with-docker.com" target="_blank">Go to Play with Docker</a>
+                    <a class="btn btn-primary" href="{{pwdUrl}}" target="_blank">Go to Play with Docker</a>
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                 </div>
             </div>
