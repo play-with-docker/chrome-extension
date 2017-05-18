@@ -29,7 +29,7 @@ function observe(cb) {
 
 function showButton() {
     if (!$('#try-in-pwd').length) {
-        $('section.secondary-top-bar-section ul').append('<li><a id="try-in-pwd" data-toggle="modal" data-target="#try-in-pwd-modal"><img src="' + chrome.extension.getURL('assets/images/button.png') + '" /></a></li>');
+        $('section.secondary-top-bar-section ul').append('<li><a style="border: 0; margin-top: 10px;" id="try-in-pwd" data-toggle="modal" data-target="#try-in-pwd-modal"><img src="https://cdn.rawgit.com/play-with-docker/stacks/cff22438/assets/images/button.png" /></a></li>');
     }
 }
 
