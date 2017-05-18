@@ -1,11 +1,61 @@
-chrome.extension.onMessage.addListener(
-    function(request, sender, sendResponse) {
-        if (!$('#try-in-pwd').length) {
-            $('section.secondary-top-bar-section ul').append('<li><a id="try-in-pwd" data-toggle="modal" data-target="#try-in-pwd-modal"><img src="' + chrome.extension.getURL('assets/images/button.png') + '" /></a></li>');
+$(document).ready(function() {
+    observe(function() {
+        var repo = getRepoPath();
+
+        if (repo) {
+            showButton();
         }
+    });
+
+    var repo = getRepoPath();
+    if (repo) {
+        showButton();
     }
-);
+});
+
 addDialog();
+
+function observe(cb) {
+    var observer = new MutationObserver(function(mutations) {
+        cb();
+    });
+
+    var target = $('div#app').get(0);
+
+    var config = { childList: true, subtree: true };
+
+    observer.observe(target, config);
+}
+
+function showButton() {
+    if (!$('#try-in-pwd').length) {
+        $('section.secondary-top-bar-section ul').append('<li><a id="try-in-pwd" data-toggle="modal" data-target="#try-in-pwd-modal"><img src="' + chrome.extension.getURL('assets/images/button.png') + '" /></a></li>');
+    }
+}
+
+function getRepoPath() {
+    var parser = $('li.active a').get(0);
+    if (!parser) {
+        return null;
+    }
+
+    var chunks = parser.pathname.split('/');
+    var path;
+    if (chunks[1] == '_') {
+        // This is an official repo
+        path = '/' + chunks[2];
+    } else if (chunks[1] == 'r' && chunks[2] == 'library') {
+        // This is a special case of the common libraries
+        path = '/' + chunks[3];
+    } else if (chunks[1] == 'r') {
+        // This is a repo of an organization
+        path = '/' + chunks[2] + '/' + chunks[3];
+    } else {
+        path = null;
+    }
+
+    return path;
+}
 
 function addDialog() {
     var container = $('body').append('<div id="pwd-dialog"></div>');
@@ -25,11 +75,17 @@ angular.module('PWD', [])
 
         var pwd = this;
 
-        chrome.extension.onMessage.addListener(
+        observe(function() {
+            var repo = getRepoPath();
+            
+            if (repo) {
+                $scope.changeRepo(repo);
+            }
+        });
+
+        chrome.runtime.onMessage.addListener(
             function(request, sender, sendResponse) {
-                if (request.type == 'change-repo') {
-                    $scope.changeRepo(request.repo);
-                } else if(request.type == 'change-opts') {
+                if(request.type == 'change-opts') {
                     $scope.$apply(function() {
                         $scope.pwdUrl = request.opts.pwdUrl;
                     });
